@@ -3,14 +3,8 @@ import requests
 import json
 ###################################
 
-#######Note#############
-########################
-#Weird behaviour occurs if min volume is higher than any markets
-########################
-########################
-
 ##########Config Variables################
-instrument = "bela" #This is the symbol of the crypto coin that you want to find arbitrage opportunities for :D
+instrument = "eth" #This is the symbol of the crypto coin that you want to find arbitrage opportunities for :D
 minVol = 200 #Minimum volume (In BTC) an exchange should have to be taken into account by this program
 #########################################
 
@@ -28,19 +22,17 @@ markets = json.loads(output.content.decode("utf-8"))["ticker"]["markets"]
 ##############Finding the cheapest exchange#####################
 for market in markets:
     market["volume"] = float(market["volume"]) * float(market["price"])
+    market["price"] = float(market["price"])
+    
     if float(market["volume"]) >= minVol:
-        if float(market["price"]) > highest["price"]:
-            highest["price"] = float(market["price"])
-            highest["market"] = market["market"]
-            highest["volume"] = market["volume"]
+        if float(market["price"]) < lowest["price"]:
+            lowest = market
 ################################################################
             
 ##############Finding the most expensive exchange###############
     if float(market["volume"]) >= minVol:
-        if float(market["price"]) < lowest["price"]:
-            lowest["price"] = float(market["price"])
-            lowest["market"] = market["market"]
-            lowest["volume"] = market["volume"]
+        if float(market["price"]) > highest["price"]:
+            highest = market
 ################################################################
             
 ################Calculating potential profit###################
