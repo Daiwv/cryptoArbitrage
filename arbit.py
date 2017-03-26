@@ -10,14 +10,14 @@ import json
 ########################
 
 ##########Config Variables################
-instrument = "dcr" #This is the symbol of the crypto coin that you want to find arbitrage opportunities for :D
-minVol = 20 #Minimum volume (In BTC) an exchange should have to be taken into account by this program
+instrument = "bela" #This is the symbol of the crypto coin that you want to find arbitrage opportunities for :D
+minVol = 200 #Minimum volume (In BTC) an exchange should have to be taken into account by this program
 #########################################
 
 ################Other declarations##########
 lowest = {"market": "No markets :(", "price": 10000000000, "volume": 0}
-highest = {"market": "No Markets :(", "price": 0, "volume": 0}
-exchangeUrls = {'yobit': 'yobit.net', 'indacoin': 'indacoin.com', 'kuna': 'en.kuna.com.ua', 'bitstamp': 'bitstamp.net', 'btc-e': 'btc-e.com', 'bittrex': 'bittrex.com', 'cex': 'cex.io', 'bleutrade': 'bleutrade.com', 'exmo': 'exmo.com', 'hitbtc': 'hitbtc.com', 'poloniex': 'poloniex.com', 'bitfinex': 'bitfinex.com', 'livecoin': 'livecoin.net', 'c-cex': 'c-cex.com', 'kraken': 'kraken.com'}
+highest = {"market": "No markets :(", "price": 0, "volume": 0}
+exchangeUrls = {'no markets :(':'There are no markets available for this asset :(', 'yobit': 'yobit.net', 'indacoin': 'indacoin.com', 'kuna': 'en.kuna.com.ua', 'bitstamp': 'bitstamp.net', 'btc-e': 'btc-e.com', 'bittrex': 'bittrex.com', 'cex': 'cex.io', 'bleutrade': 'bleutrade.com', 'exmo': 'exmo.com', 'hitbtc': 'hitbtc.com', 'poloniex': 'poloniex.com', 'bitfinex': 'bitfinex.com', 'livecoin': 'livecoin.net', 'c-cex': 'c-cex.com', 'kraken': 'kraken.com'}
 ############################################
 
 ########Geting exchange market list and data for the coin########
