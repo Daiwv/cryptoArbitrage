@@ -24,6 +24,9 @@ markets = json.loads(output.content.decode("utf-8"))["ticker"]["markets"]
 
 ##############Finding the cheapest exchange#####################
 for market in markets:
+    if market["market"] == "Hitbtc":  ###Hitbit has btc withdrawls disabled
+        continue
+        
     market["volume"] = float(market["volume"]) * float(market["price"])
     market["price"] = float(market["price"])
     
