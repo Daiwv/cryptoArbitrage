@@ -3,8 +3,11 @@ import requests
 import json
 ###################################
 
+###Prompt user for what coin to analyse###
+instrument = input("Enter a coin: ") #This is the symbol of the crypto coin that you want to find arbitrage opportunities for :D
+##########################################
+
 ##########Config Variables################
-instrument = "eth" #This is the symbol of the crypto coin that you want to find arbitrage opportunities for :D
 minVol = 200 #Minimum volume (In BTC) an exchange should have to be taken into account by this program
 #########################################
 
