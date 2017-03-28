@@ -6,7 +6,7 @@ import time
 
 ####################Config Variables####################
 minVol = 200 #Minimum volume (In BTC) an exchange should have to be taken into account by this program
-exchangedToIgnore = ["Hitbtc"]
+exchangedToIgnore = ["Hitbtc", "indacoin"]
 ########################################################
 
 #########Prompt user for what coin to analyse###########
