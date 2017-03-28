@@ -1,53 +1,82 @@
-#####Importing modules#############
+###################Importing modules####################
 import requests
 import json
-###################################
+import time
+########################################################
 
-###Prompt user for what coin to analyse###
-instrument = input("Enter a coin: ") #This is the symbol of the crypto coin that you want to find arbitrage opportunities for :D
-##########################################
-
-##########Config Variables################
+####################Config Variables####################
 minVol = 200 #Minimum volume (In BTC) an exchange should have to be taken into account by this program
-#########################################
+exchangedToIgnore = ["Hitbtc"]
+########################################################
 
-################Other declarations##########
-lowest = {"market": "No markets :(", "price": 10000000000, "volume": 0}
-highest = {"market": "No markets :(", "price": 0, "volume": 0}
-exchangeUrls = {'no markets :(':'There are no markets available for this asset :(', 'yobit': 'yobit.net', 'indacoin': 'indacoin.com', 'kuna': 'en.kuna.com.ua', 'bitstamp': 'bitstamp.net', 'btc-e': 'btc-e.com', 'bittrex': 'bittrex.com', 'cex': 'cex.io', 'bleutrade': 'bleutrade.com', 'exmo': 'exmo.com', 'hitbtc': 'hitbtc.com', 'poloniex': 'poloniex.com', 'bitfinex': 'bitfinex.com', 'livecoin': 'livecoin.net', 'c-cex': 'c-cex.com', 'kraken': 'kraken.com'}
-############################################
+#########Prompt user for what coin to analyse###########
+def getPair():
+    startTime = time.time()
+    input("Base Currency: For BTC, press enter instantly. For USD, press enter after 2 seconds.")
+    timeDelta = time.time() - startTime
+    baseCurrency = "-btc" if timeDelta < 2 else "-usd"
+    print("Base currency: " + baseCurrency[1:].upper())
+    pair = input("Coin: ") + baseCurrency
+    return pair
+########################################################
 
-########Geting exchange market list and data for the coin########
-output = requests.get("https://api.cryptonator.com/api/full/" + instrument + "-btc")
-markets = json.loads(output.content.decode("utf-8"))["ticker"]["markets"]
-################################################################
+################Function gets market list###############
+def getMarketList(pair):
+    output = requests.get("https://api.cryptonator.com/api/full/" + pair)
+    markets = json.loads(output.content.decode("utf-8"))["ticker"]["markets"]
+    return markets
+########################################################
 
-##############Finding the cheapest exchange#####################
-for market in markets:
-    if market["market"] == "Hitbtc":  ###Hitbit has btc withdrawls disabled
-        continue
+######Function finds lowest and highest exchanges#######
+def getLowestHighestMarkets(exchangedToIgnore, minVol, markets):
+    lowestMarket = {"price": 10000000000, "volume": 0}
+    highestMarket = {"price": 0, "volume": 0}
+    for market in markets:
+        if market["market"] not in exchangedToIgnore:
+            market["price"] = marketPrice = float(market["price"])
+            market["volume"] = marketVolume = market["volume"] * market["price"]
+            
+            if float(marketVolume) >= minVol:
+                if marketPrice < lowestMarket["price"]:
+                    lowestMarket = market
+
+                if marketPrice > highestMarket["price"]:
+                    highestMarket = market
         
-    market["volume"] = float(market["volume"]) * float(market["price"])
-    market["price"] = float(market["price"])
+    return {"lowestMarket" : lowestMarket, "highestMarket" : highestMarket}
+########################################################
+            
+###############Function calculates stats################
+def calcStats(lowestHighestMarkets, pair):
+    lowestMarket = lowestHighestMarkets["lowestMarket"]
+    highestMarket = lowestHighestMarkets["highestMarket"]
+    exchangeUrls = {'yobit' : 'http://yobit.net', 'indacoin' : 'http://indacoin.com', 'kuna' : 'http://en.kuna.com.ua', 'bitstamp' : 'http://bitstamp.net', 'btc-e' : 'http://btc-e.com', 'bittrex' : 'http://bittrex.com', 'cex' : 'http://cex.io', 'http://bleutrade' : 'http://bleutrade.com', 'exmo' : 'http://exmo.com', 'hitbtc' : 'http://hitbtc.com', 'poloniex' : 'http://poloniex.com', 'bitfinex' : 'http://bitfinex.com', 'livecoin' : 'http://livecoin.net', 'c-cex' : 'http://c-cex.com', 'kraken' : 'http://kraken.com'}
     
-    if float(market["volume"]) >= minVol:
-        if float(market["price"]) < lowest["price"]:
-            lowest = market
-################################################################
-            
-##############Finding the most expensive exchange###############
-    if float(market["volume"]) >= minVol:
-        if float(market["price"]) > highest["price"]:
-            highest = market
-################################################################
-            
-################Calculating potential profit###################
-profit = highest["price"] / (lowest["price"] / 100) - 100
-roundedProfit = round(profit, 3)
-################################################################
+    baseCurrency = pair[-3:]
+    potentialGainPercent = round(highestMarket["price"] / (lowestMarket["price"] / 100) - 100, 3)
+    
+    lowestExchangeUrl = exchangeUrls[lowestMarket["market"].lower()]
+    highestExchangeUrl = exchangeUrls[highestMarket["market"].lower()]
+    
+    lowestExchange = lowestMarket["market"]
+    highestExchange = highestMarket["market"]
+    
+    lowestPrice = lowestMarket["price"]
+    highestPrice = highestMarket["price"]
+    
+    return {"baseCurrency" : baseCurrency, "potentialGainPercent" : potentialGainPercent, "lowestExchangeUrl" : lowestExchangeUrl, "highestExchangeUrl" : highestExchangeUrl, "lowestPrice" : lowestPrice, "highestPrice" : highestPrice}
+########################################################
 
-##########Alerting the user of findings#########################
-print("Buy " + instrument + " at " + lowest["market"] + " for " + format(lowest["price"], '.8f') + " BTC \tVolume: " + str(lowest["volume"]) + " BTC\nhttp://" + exchangeUrls[lowest["market"].lower()])
-print("Sell " + instrument + " at " + highest["market"] + " for " + format(highest["price"], '.8f') + " BTC \tVolume: " + str(highest["volume"]) + " BTC\nhttp://" + exchangeUrls[highest["market"].lower()])
-print(str(roundedProfit) + "% profit")
-################################################################
+#####################Run Functions######################
+pair = getPair()
+markets = getMarketList(pair)
+lowestHighestMarkets = getLowestHighestMarkets(exchangedToIgnore, minVol, markets)
+stats = calcStats(lowestHighestMarkets, pair)
+########################################################
+
+################Alerts user of findings#################
+print("\n")
+print("Buy at " + stats["lowestExchangeUrl"] + " for " + format(stats["lowestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
+print("Sell at " + stats["highestExchangeUrl"] + " for " + format(stats["highestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
+print("Potential gain: " + str(stats["potentialGainPercent"]) + "%")
+########################################################
