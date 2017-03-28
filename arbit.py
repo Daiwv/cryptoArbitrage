@@ -6,7 +6,7 @@ import time
 
 ####################Config Variables####################
 minVol = 200 #Minimum volume (In BTC) an exchange should have to be taken into account by this program
-exchangedToIgnore = ["Hitbtc", "indacoin"]
+exchangedToIgnore = ["hitbit", "indacoin"]
 ########################################################
 
 #########Prompt user for what coin to analyse###########
@@ -32,7 +32,7 @@ def getLowestHighestMarkets(exchangedToIgnore, minVol, markets):
     lowestMarket = {"price": 10000000000, "volume": 0}
     highestMarket = {"price": 0, "volume": 0}
     for market in markets:
-        if market["market"] not in exchangedToIgnore:
+        if market["market"].lower() not in exchangedToIgnore:
             market["price"] = marketPrice = float(market["price"])
             market["volume"] = marketVolume = market["volume"] * market["price"]
             
