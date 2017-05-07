@@ -80,7 +80,7 @@ for coin in coinNames:
     lowestHighestMarkets = getLowestHighestMarkets(exchangedToIgnore, minVol, markets)
     arbitrageStats = calcStats(lowestHighestMarkets, coin)
     if arbitrageStats["potentialGainPercent"] > 0:
-        coinStats.append()
+        coinStats.append(arbitrageStats)
 ########################################################
 
 os.system("clear")
