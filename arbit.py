@@ -7,28 +7,19 @@ import time
 ####################Config Variables####################
 minVol = 200 #Minimum volume (In BTC) an exchange should have to be taken into account by this program
 exchangedToIgnore = ["hitbtc", "indacoin"]
+substitutedNames = {"PINK-btc":"pc-btc"}
 ########################################################
 
-def getCoinNames():
+def getCoinNames(minVol):
   from poloniex import Poloniex
   api =  Poloniex()
   coinList = []
   coins = api.return24hVolume()
   for market in coins:
-    if "BTC_" in market and float(coins[market]["BTC"]) > 200:
+    if "BTC_" in market and float(coins[market]["BTC"]) > minVol:
       coinList.append(market.replace("BTC_","") + "-btc")
+  coinList = [substitutedNames[x] if x in substitutedNames else x for x in coinList]
   return coinList
-
-#########Prompt user for what coin to analyse###########
-def getPair():
-    startTime = time.time()
-    input("Base Currency: For BTC, press enter instantly. For USD, press enter after 2 seconds.")
-    timeDelta = time.time() - startTime
-    baseCurrency = "-btc" if timeDelta < 2 else "-usd"
-    print("Base currency: " + baseCurrency[1:].upper())
-    pair = input("Coin: ") + baseCurrency
-    return pair
-########################################################
 
 ################Function gets market list###############
 def getMarketList(pair):
@@ -74,20 +65,28 @@ def calcStats(lowestHighestMarkets, pair):
     lowestPrice = lowestMarket["price"]
     highestPrice = highestMarket["price"]
     
-    return {"baseCurrency" : baseCurrency, "potentialGainPercent" : potentialGainPercent, "lowestExchangeUrl" : lowestExchangeUrl, "highestExchangeUrl" : highestExchangeUrl, "lowestPrice" : lowestPrice, "highestPrice" : highestPrice}
+    return {"pair" : pair, "baseCurrency" : baseCurrency, "potentialGainPercent" : potentialGainPercent, "lowestExchangeUrl" : lowestExchangeUrl, "highestExchangeUrl" : highestExchangeUrl, "lowestPrice" : lowestPrice, "highestPrice" : highestPrice}
 ########################################################
 
 #####################Run Functions######################
 coinStats = []
-for coin in getCoinNames():
+coinNames = getCoinNames(minVol)
+import os
+for coin in coinNames:
+    os.system("clear")
+    os.system("clear")
+    print(str(round(100 / (len(coinNames) / (coinNames.index(coin) + 1)), 1)) + "%")
     markets = getMarketList(coin)
     lowestHighestMarkets = getLowestHighestMarkets(exchangedToIgnore, minVol, markets)
-    coinStats.append(calcStats(lowestHighestMarkets, pair))
+    coinStats.append(calcStats(lowestHighestMarkets, coin))
 ########################################################
 
-################Alerts user of findings#################
-for coin in coinStats.sort(key=lambda x: x["potentialGainPercent"]):
+os.system("clear")
+os.system("clear")
+for coin in sorted(coinStats, key=lambda k: k['potentialGainPercent']):
+    stats = coin
     print("\n")
+    print("Pair: " + stats["pair"])
     print("Buy at " + stats["lowestExchangeUrl"] + " for " + format(stats["lowestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
     print("Sell at " + stats["highestExchangeUrl"] + " for " + format(stats["highestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
     print("Potential gain: " + str(stats["potentialGainPercent"]) + "%")
