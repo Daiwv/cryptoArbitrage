@@ -78,7 +78,9 @@ for coin in coinNames:
     print(str(round(100 / (len(coinNames) / (coinNames.index(coin) + 1)), 1)) + "%")
     markets = getMarketList(coin)
     lowestHighestMarkets = getLowestHighestMarkets(exchangedToIgnore, minVol, markets)
-    coinStats.append(calcStats(lowestHighestMarkets, coin))
+    arbitrageStats = calcStats(lowestHighestMarkets, coin)
+    if arbitrageStats["potentialGainPercent"] > 0:
+        coinStats.append()
 ########################################################
 
 os.system("clear")
