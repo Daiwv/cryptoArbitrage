@@ -9,6 +9,16 @@ minVol = 200 #Minimum volume (In BTC) an exchange should have to be taken into a
 exchangedToIgnore = ["hitbtc", "indacoin"]
 ########################################################
 
+def getCoinNames():
+  from poloniex import Poloniex
+  api =  Poloniex()
+  coinList = []
+  coins = api.return24hVolume()
+  for market in coins:
+    if "BTC_" in market and float(coins[market]["BTC"]) > 200:
+      coinList.append(market.replace("BTC_","") + "-btc")
+  return coinList
+
 #########Prompt user for what coin to analyse###########
 def getPair():
     startTime = time.time()
@@ -68,15 +78,15 @@ def calcStats(lowestHighestMarkets, pair):
 ########################################################
 
 #####################Run Functions######################
-pair = getPair()
-markets = getMarketList(pair)
-lowestHighestMarkets = getLowestHighestMarkets(exchangedToIgnore, minVol, markets)
-stats = calcStats(lowestHighestMarkets, pair)
+for coin in getCoinNames():
+    markets = getMarketList(coin)
+    lowestHighestMarkets = getLowestHighestMarkets(exchangedToIgnore, minVol, markets)
+    stats = calcStats(lowestHighestMarkets, pair)
 ########################################################
 
 ################Alerts user of findings#################
-print("\n")
-print("Buy at " + stats["lowestExchangeUrl"] + " for " + format(stats["lowestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
-print("Sell at " + stats["highestExchangeUrl"] + " for " + format(stats["highestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
-print("Potential gain: " + str(stats["potentialGainPercent"]) + "%")
+    print("\n")
+    print("Buy at " + stats["lowestExchangeUrl"] + " for " + format(stats["lowestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
+    print("Sell at " + stats["highestExchangeUrl"] + " for " + format(stats["highestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
+    print("Potential gain: " + str(stats["potentialGainPercent"]) + "%")
 ########################################################
