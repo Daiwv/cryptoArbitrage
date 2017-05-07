@@ -78,13 +78,15 @@ def calcStats(lowestHighestMarkets, pair):
 ########################################################
 
 #####################Run Functions######################
+coinStats = []
 for coin in getCoinNames():
     markets = getMarketList(coin)
     lowestHighestMarkets = getLowestHighestMarkets(exchangedToIgnore, minVol, markets)
-    stats = calcStats(lowestHighestMarkets, pair)
+    coinStats.append(calcStats(lowestHighestMarkets, pair))
 ########################################################
 
 ################Alerts user of findings#################
+for coin in coinStats.sort(key=lambda x: x["potentialGainPercent"]):
     print("\n")
     print("Buy at " + stats["lowestExchangeUrl"] + " for " + format(stats["lowestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
     print("Sell at " + stats["highestExchangeUrl"] + " for " + format(stats["highestPrice"], '.8f') + " " + stats["baseCurrency"].upper())
