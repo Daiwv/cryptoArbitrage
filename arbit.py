@@ -69,20 +69,22 @@ def calcStats(lowestHighestMarkets, pair):
 ########################################################
 
 #####################Run Functions######################
-coinStats = []
-coinNames = getCoinNames(minVol)
-import os
-for coin in coinNames:
-    os.system("clear")
-    os.system("clear")
-    print(str(round(100 / (len(coinNames) / (coinNames.index(coin) + 1)), 1)) + "%")
-    markets = getMarketList(coin)
-    lowestHighestMarkets = getLowestHighestMarkets(exchangedToIgnore, minVol, markets)
-    arbitrageStats = calcStats(lowestHighestMarkets, coin)
-    if arbitrageStats["potentialGainPercent"] > 0:
-        coinStats.append(arbitrageStats)
+def getCoinStats()
+    coinStats = []
+    coinNames = getCoinNames(minVol)
+    import os
+    for coin in coinNames:
+        os.system("clear")
+        os.system("clear")
+        print(str(round(100 / (len(coinNames) / (coinNames.index(coin) + 1)), 1)) + "%")
+        markets = getMarketList(coin)
+        lowestHighestMarkets = getLowestHighestMarkets(exchangedToIgnore, minVol, markets)
+        arbitrageStats = calcStats(lowestHighestMarkets, coin)
+        if arbitrageStats["potentialGainPercent"] > 0:
+            coinStats.append(arbitrageStats)
+    return coinStats
 ########################################################
-
+coinStats = getCoinStats
 os.system("clear")
 os.system("clear")
 for coin in sorted(coinStats, key=lambda k: k['potentialGainPercent']):
